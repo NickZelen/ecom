@@ -1,29 +1,34 @@
+
 import pip
+module= ['import socket','import os','import datetime','import zipfile','import pyzipper','from colorama import Fore']
+while True:
+    try:
+        for m in module:
+            __import__(m)
+            break
+    except:
+        pip.main(["install",m])
 
 
 
-import socket
-import os
-import datetime
-import zipfile
-import pyzipper
+
+
 from colorama import Fore
 import string
 from itertools import *
 import threading
-from rarfile import RarFile
+
 import platform
 import socket
 import http.client
 import getpass
-import rarfile
 from rarfile import RarFile
 import easygui
 
 
 # from tqdm.contrib import tzip
 
-
+''' '''
 def system():
     global inf_user
     inf_user = []
@@ -31,26 +36,113 @@ def system():
     inf_user.append(platform.uname().release)
     inf_user.append(platform.uname().processor)
     inf_user.append(getpass.getuser())
+    return ip_good()
 
-
+''' '''
 def ip_good():
     c = http.client.HTTPConnection("ifconfig.me")
     c.request("GET", "/ip")
     inf_user.append(c.getresponse().read())
+    return client()
 
-
+''' '''
 def client():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    port = '1984'
-    host = '46.116.41.26'
-    s.connect((host, port))
+    #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #port = 1984
+    #host = '46.116.41.26'
+    #s.connect((host, port))
     try:
-        sor.sendto((inf_user + 'Connect').encode('utf-8'), server)
+        print(inf_user)
+        #sor.sendto((inf_user + 'Connect').encode('utf-8'), server)
     except:
         pass
-    s.close()
+    #s.close()
 
 
+
+
+
+
+
+
+
+
+''' getting a file - if the graphical method does not start - 
+the possibility of input through the terminal is turned on.'''
+def get_archive():
+    global archive
+    try:
+        archive = easygui.fileopenbox('open', 'archive(rar or zip)')
+        get_passw()
+    except:
+        print(
+            "to simplify the work with the archive, please kindly place the archive in the folder with the script being launched.the archive will be unpacked to the same folder - do not forget to remove files after opening. (if you have nothing to hide, cover your tracks.)")
+        test_path = input("type path to the archive:  ")
+        if os.path.exists(test_path):
+            if os.path.isfile(test_path):
+                archive = test_path
+                ''' information about the file for the user that may be of interest to him'''
+                print(os.path.getsize(test_path))
+                print(datetime.datetime.fromtimestamp(int(os.path.getctime(test_path))))
+                print(datetime.datetime.fromtimestamp(int(os.path.getatime(test_path))))
+                print(datetime.datetime.fromtimestamp(int(os.path.getmtime(test_path))))
+            elif os.path.isdir(test_path):
+                print(os.listdir(test_path))
+                get_archive()
+        else:
+            print('object not found')
+            get_archive()
+    return get_passw()
+
+''' getting a file - if the graphical method does not start - 
+the possibility of input through the terminal is turned on.'''
+# getting passw.file
+def get_passw():
+    global pwd
+    try:
+        pwd = easygui.fileopenbox('open', 'password list')
+        ziporrar()
+    except:
+        print(
+            'if you have your oun password list, please kindly place the archive in the folder with the script being launched and type name of the file(txt): ')
+        test_pwd = input('type path to  password list: ')
+        if os.path.exists(test_pwd):
+            if os.path.isfile(test_pwd):
+                pwd = test_pwd
+            else:
+                pwd = 'kalikali.txt'
+        else:
+            pwd = 'kalikali.txt'
+    return pwd
+
+
+
+
+
+
+
+
+'''we obtain permission to collect information for the operation of the application.
+if we don't get it, the application exits.
+otherwise, we get the username, system parameters and IP'''
+
+def main():
+    term_cond ="by using the application you unreservedly agree to the terms of use and privacy policy" #condition
+    t_t = "the inscription |beware of thieves| in the city of odessa, near the central market was made by thieves of this city, this market.the goal is simple.find out exactly where this person wears what he would not want to lose." #Title
+    ch = ["C[o]ntinue", "C[a]ncel"] #
+    choice=easygui.ccbox(msg=term_cond, title=t_t, choices=ch)
+    if choice==1:
+        system()
+        get_archive()
+    else:
+        exit('the program ended due to disagreement with the terms of use')
+
+
+
+
+
+
+''' '''
 # familiarity with the file. checking type of arch zip or rar.
 # determine what we are working with
 def ziporrar():
@@ -66,6 +158,10 @@ def ziporrar():
         return main()
 
 
+
+
+
+''' '''
 # work with zip:
 def znames():
     zippwdlist = []
@@ -76,7 +172,7 @@ def znames():
                 zippwdlist.append(file_info.filename)  # we will try to decrypt only encrypted files
     return zipp(zippwdlist)
 
-
+''' '''
 # if the file is protected - it goes to the list to try to guess the password
 def zipp(zippwdlist):
     print('zipp(zippwdlist)')
@@ -84,7 +180,7 @@ def zipp(zippwdlist):
         print(Fore.MAGENTA + "File:\t", name_of_file)
         brute_z(name_of_file)
 
-
+''' '''
 # directly Brut Force himself (for zip,from list)
 def brute_z(name_of_file):
     with open(pwd, "rb") as w:
@@ -105,6 +201,13 @@ def brute_z(name_of_file):
             print(Fore.RED + "The password is not in the proposed list")
 
 
+
+
+
+
+
+
+''' '''
 # work with rar:
 def Rnames():
     print('Rnames()')
@@ -113,7 +216,7 @@ def Rnames():
             print(Fore.GREEN + archive, ': password-protected')
     return brute_r(archive)
 
-
+''' '''
 # directly Brut Force himself (for rar,from list)
 def brute_r(archive):
     print('brute_r(archive)')
@@ -133,109 +236,68 @@ def brute_r(archive):
             else:
                 print(Fore.RED + "The password is not in the proposed list")
 
+    len_pwd = 1
+    all_symbols_list = []
 
-len_pwd = 1
-all_symbols_list = []
+    '''creating a list for brute force '''
 
+    def list_to_brute(all_symbols_list, len_pwd):
+        all_symbols = (list(string.printable))
+        for i in product(all_symbols, repeat=len_pwd):
+            i = ''.join(i)
+            print(i)
+            all_symbols_list.append(i)
+        return bruteForce(all_symbols_list, len_pwd, archive)
 
-def list_to_brute(all_symbols_list, len_pwd):
-    all_symbols = (list(string.printable))
-    for i in product(all_symbols, repeat=len_pwd):
-        i = ''.join(i)
-        print(i)
-        all_symbols_list.append(i)
-    return bruteForce(all_symbols_list, len_pwd, archive)
+    '''  brute force '''
+    # true_brute=> enumeration method. very resource intensive
+    wrongPassword = []
 
+    def bruteForce(all_symbols_list, len_pwd, name_of_file):
+        for i in all_symbols_list:
+            b_password = i.encode('utf-8')
+            print(Fore.GREEN + 'Password', b_password, type(b_password))
+            if b_password not in wrongPassword:
+                if Try_z(name_of_file, b_password):
+                    pass
+                else:
+                    wrongPassword.append(b_password)
+                    len_pwd += 1
+                    all_symbols_list.clear()
+                    list_to_brute(all_symbols_list, len_pwd)
 
-# true_brute=> enumeration method. very resource intensive
-wrongPassword = []
-def bruteForce(all_symbols_list, len_pwd, name_of_file):
-    for i in all_symbols_list:
-        b_password = i.encode('utf-8')
-        print(Fore.GREEN + 'Password', b_password, type(b_password))
-        if b_password not in wrongPassword:
-            if Try_z(name_of_file, b_password):
-                pass
-            else:
-                wrongPassword.append(b_password)
-                len_pwd += 1
-                all_symbols_list.clear()
-                list_to_brute(all_symbols_list, len_pwd)
+    '''attempt to open document with received password '''
 
-
-def Try_z(name_of_file, b_password):
-    try:
-        with pyzipper.AESZipFile(archive, 'r') as z:
-            b_password = b_password.strip()
-            z.extract(name_of_file, path='D:\python\ecom\ecom', pwd=b_password)
-            # z.open(name_of_file, pwd=pwd)
-            print(Fore.GREEN + "\nPassword: {}.\n Contents are extracted to {}".format(b_password.decode(),
-                                                                                       'D:\python\ecom\ecom'))
-    except:
-        # (Fore.RED + "The password is not in the proposed list")
-        return False
-    else:
-        return True
-
-
-def Try_r(archive, password):
-    pass
-
-
-# getting archive
-def get_archive():
-    global archive
-    try:
-        archive = easygui.fileopenbox('archive', 'archive')
-    except:
-        print(
-            "to simplify the work with the archive, please kindly place the archive in the folder with the script being launched.the archive will be unpacked to the same folder - do not forget to remove files after opening. (if you have nothing to hide, cover your tracks.)")
-        test_path = input("type path to the archive:  ")
-        if os.path.exists(test_path):
-            if os.path.isfile(test_path):
-                archive = test_path
-                print(os.path.getsize(test_path))
-                print(datetime.datetime.fromtimestamp(int(os.path.getctime(test_path))))
-                print(datetime.datetime.fromtimestamp(int(os.path.getatime(test_path))))
-                print(datetime.datetime.fromtimestamp(int(os.path.getmtime(test_path))))
-            elif os.path.isdir(test_path):
-                print(os.listdir(test_path))
-                get_archive()
+    def Try_z(name_of_file, b_password):
+        try:
+            with pyzipper.AESZipFile(archive, 'r') as z:
+                b_password = b_password.strip()
+                z.extract(name_of_file, path='D:\python\ecom\ecom', pwd=b_password)
+                # z.open(name_of_file, pwd=pwd)
+                print(Fore.GREEN + "\nPassword: {}.\n Contents are extracted to {}".format(b_password.decode(),
+                                                                                           'D:\python\ecom\ecom'))
+        except:
+            # (Fore.RED + "The password is not in the proposed list")
+            return False
         else:
-            print('object not found')
-            get_archive()
-    return get_passw()
+            return True
+
+    ''' pass'''
+
+    def Try_r(archive, password):
+        pass
 
 
-# getting passw.file
-def get_passw():
-    global pwd
-    try:
-        pwd_msg = '''if you have your oun password list, please kindly place the archive in the folder with the script being launched and type name of the file(txt):'''
-        pwd = easygui.fileopenbox(pwd_msg, 'password list')
-    except:
-        print(
-            'if you have your oun password list, please kindly place the archive in the folder with the script being launched and type name of the file(txt): ')
-        test_pwd = input('type path to  password list: ')
-        if os.path.exists(test_pwd):
-            if os.path.isfile(test_pwd):
-                pwd = test_pwd
-            else:
-                pwd = 'kalikali.txt'
-        else:
-            pwd = 'kalikali.txt'
-    return pwd
 
 
-def main():
-    get_archive()
+
+#def for_test():
+    #get_archive()
     archive = '12345.zip'
     # archive='12345.rar'
-    pwd = 'kalikali.txt'
+    #pwd = 'kalikali.txt'
 
 
+main()
 
 
-get_archive()
-get_passw()
-ziporrar()
